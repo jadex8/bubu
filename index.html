@@ -1,0 +1,87 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>DOMParser Example</title>
+</head>
+<body>
+  <h1>English-Womens-Super-League</h1>
+  <div class="contain"> 
+    <div id="title_up1"><h2></h2></div>
+    <div class="upcoming" id="upcoming_1"></div>
+    <div id="title_re1"></div>
+    <div class="results" id="results_1"></div>
+  </div>
+  <div class="break"></div>
+  <h1>UEFA-Womens-Champions-League</h1>
+  <div class="contain"> 
+    <div id="title_up2"><h2></h2></div>
+    <div class="upcoming" id="upcoming_2"></div>
+    <div id="title_re2"></div>
+    <div class="results" id="results_2"></div>
+  </div>
+  
+  <script>
+    // Replace this URL with the URL of the CORS-enabled website or API.
+    const url = 'https://www.thesportsdb.com/league/4849-English-Womens-Super-League';
+    function upload(url, title1, title2, upcoming, results){
+      fetch(url)
+        .then(response => response.text())
+        .then(htmlString => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlString, 'text/html');
+
+          var extractedText = doc.querySelectorAll('td'); 
+          console.log(extractedText);
+          console.log(extractedText.length);
+          document.getElementById(title1).innerHTML = '<h2>Upcoming</h2>';
+
+          var i=0
+          for(i=0; i<extractedText.length; i=i+6){
+          if(extractedText[i].innerText == "Results"){
+            break;
+          }
+          document.getElementById(upcoming).innerHTML+= (
+            '<table>' +
+                '<tr>'+
+                '<td>' + extractedText[i].innerText + '</td>' +
+                '<td>' +extractedText[i+1].innerText + '</td>' +
+                '<td>' +extractedText[i+2].innerText + '</td>' +
+                '<td>' +extractedText[i+3].innerText+'</td>' +
+                '<td>' + extractedText[i+5].innerText + '</td>' +
+                '</tr>' + '</table>' 
+          )  
+          }
+          document.getElementById(title2).innerHTML = '<h2>Results</h2>';
+
+          i=i+1
+          console.log(extractedText[i].innerText) 
+          for(; i<extractedText.length; i=i+6){
+            if(extractedText[i].innerText.length >8){
+              break;
+            }
+            console.log('lengtj= ' + extractedText[i].innerText)
+            document.getElementById(results).innerHTML+= (
+                '<table>' +
+                '<tr>'+
+                '<td>' + extractedText[i].innerText + '</td>' +
+                '<td>' + extractedText[i+5].innerText + '</td>' +
+                '<td>' +extractedText[i+1].innerText + '</td>' +
+                '<td>' +extractedText[i+2].innerText + '</td>' +
+                '<td>' +extractedText[i+3].innerText+'</td>' +
+                '</tr>' + '</table>' 
+                
+            )  
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching or parsing:', error);
+          document.getElementById('content').innerText = 'Failed to load data.';
+        });
+      }
+      upload('https://www.thesportsdb.com/league/4849-English-Womens-Super-League', 'title_up1', 'title_re1', 'upcoming_1', 'results_1');
+      upload('https://www.thesportsdb.com/league/4889-UEFA-Womens-Champions-League', 'title_up2', 'title_re2', 'upcoming_2', 'results_2');
+  </script>
+</body>
+</html>
